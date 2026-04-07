@@ -541,6 +541,45 @@ class LLMClient:
         return response.text
 
 
+def enrich_entity_from_wikipedia(entity: dict) -> dict:
+    """Create a grimoire-style entry from Wikipedia data alone (no LLM needed)."""
+    name = entity["name"]
+    etype = entity["type"]
+    extract = entity["wikipedia_extract"]
+
+    # Take first 2 sentences as description
+    sentences = re.split(r'(?<=[.!?])\s+', extract)
+    description = " ".join(sentences[:2]).strip() if sentences else f"A {etype} of ancient legend."
+
+    # Extract a title from the first sentence
+    title = ""
+    first = sentences[0] if sentences else ""
+    # Pattern: "X is the god of Y" or "X is a Y in Z mythology"
+    m = re.search(r'is (?:the |a |an )?(.+?)(?:\.|,| in | who | and )', first, re.IGNORECASE)
+    if m:
+        title = m.group(1).strip().rstrip(",.")[:60]
+    if not title:
+        title = f"{etype.capitalize()} of legend"
+
+    # Build image prompt
+    image_prompt = (
+        f"Black and white ink contour drawing, grimoire illustration style, "
+        f"detailed linework, parchment aesthetic, {name}, {title}, "
+        f"ancient manuscript illustration"
+    )
+
+    return {
+        "title": title.title() if len(title) < 40 else title,
+        "description": description,
+        "appearance": f"Ancient depiction of {name}, {title}.",
+        "powers": [],
+        "symbols": [],
+        "personality": "",
+        "alignment": "neutral",
+        "image_prompt": image_prompt,
+    }
+
+
 def enrich_entity(entity: dict, llm: LLMClient) -> dict:
     """Use LLM to transform Wikipedia data into grimoire entry."""
     text = llm.chat(
@@ -639,6 +678,8 @@ def generate_images_for_entity(entity_id: str, prompt: str) -> dict:
 def main():
     parser = argparse.ArgumentParser(description="Hybrid scrape + LLM pipeline for Omnis Mytho")
     parser.add_argument("--skip-images", action="store_true", help="Skip image generation")
+    parser.add_argument("--no-llm", action="store_true",
+                        help="Skip LLM enrichment — use Wikipedia data directly (no API key needed)")
     parser.add_argument("--mythology", type=str, default=None,
                         help="Generate only one mythology (e.g. 'greek')")
     parser.add_argument("--llm", type=str, choices=["auto", "openai", "gemini"], default="auto",
@@ -651,8 +692,12 @@ def main():
         print("Set FAL_KEY for image generation, or use --skip-images.")
         sys.exit(1)
 
-    # Initialize LLM with fallback
-    llm = LLMClient(preferred=args.llm)
+    # Initialize LLM (or skip)
+    llm = None
+    if not args.no_llm:
+        llm = LLMClient(preferred=args.llm)
+    else:
+        print("  LLM: disabled (--no-llm) — using Wikipedia data directly")
 
     # Select mythologies
     if args.mythology:
@@ -686,25 +731,32 @@ def main():
         }
 
         # Enrich mythology description
-        print(f"\n  Enriching mythology description...")
-        desc = llm.chat(
-            system=ENRICH_SYSTEM,
-            user=f"Write a 2-sentence grimoire-style description for {scraped['name']} ({scraped['origin']}). Return ONLY the text, no JSON.",
-        )
-        mythology_entry["description"] = desc.strip() if desc else f"The ancient tradition of {scraped['name']}."
+        if llm:
+            print(f"\n  Enriching mythology description...")
+            desc = llm.chat(
+                system=ENRICH_SYSTEM,
+                user=f"Write a 2-sentence grimoire-style description for {scraped['name']} ({scraped['origin']}). Return ONLY the text, no JSON.",
+            )
+            mythology_entry["description"] = desc.strip() if desc else f"The ancient tradition of {scraped['name']}."
+        else:
+            mythology_entry["description"] = f"The ancient tradition of {scraped['name']}, from the lands of {scraped['origin']}."
 
         all_data["mythologies"].append(mythology_entry)
 
-        # Step 2: Enrich each entity with LLM
-        print(f"\n  Enriching {len(scraped['entities'])} entities with LLM...")
+        # Step 2: Enrich each entity
+        mode = "LLM" if llm else "Wikipedia"
+        print(f"\n  Enriching {len(scraped['entities'])} entities with {mode}...")
         for i, raw_entity in enumerate(scraped["entities"]):
             entity_name = raw_entity["name"]
             entity_id = f"{myth_id}-{entity_name.lower().replace(' ', '-').replace('ö', 'o').replace('ō', 'o').replace('ū', 'u')}-{i+1:03d}"
 
-            print(f"\n  [{i+1}/{len(scraped['entities'])}] {entity_name}")
-            print(f"    Enriching with LLM...")
+            print(f"  [{i+1}/{len(scraped['entities'])}] {entity_name}")
 
-            enriched = enrich_entity(raw_entity, llm)
+            if llm:
+                enriched = enrich_entity(raw_entity, llm)
+            else:
+                enriched = enrich_entity_from_wikipedia(raw_entity)
+
             if not enriched:
                 print(f"    -> Skipping (enrichment failed)")
                 continue
