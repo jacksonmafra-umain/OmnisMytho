@@ -36,10 +36,14 @@ fun CatalogPage(
         }
     }
 
+    val loadedState = state as? CatalogState.Loaded
+
     CatalogTemplate(
         title = mythologyId.replaceFirstChar { it.uppercase() } + " Mythology",
-        subtitle = if (state is CatalogState.Loaded) "${(state as CatalogState.Loaded).entities.size} entities found" else "",
+        subtitle = if (loadedState != null) "${loadedState.entities.size} entities found" else "",
+        sortLabel = if (loadedState?.sortAscending != false) "A-Z" else "Z-A",
         onBack = onNavigateBack,
+        onSort = { viewModel.emit(CatalogEvent.OnToggleSort) },
         filterBar = {
             FilterBar(
                 selectedType = (state as? CatalogState.Loaded)?.currentFilter,
