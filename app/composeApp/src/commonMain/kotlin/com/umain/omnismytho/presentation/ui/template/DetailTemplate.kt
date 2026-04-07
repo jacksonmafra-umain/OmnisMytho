@@ -32,6 +32,8 @@ import com.umain.omnismytho.presentation.ui.theme.LocalSpacing
 @Composable
 fun DetailTemplate(
     onBack: () -> Unit,
+    onBookmark: () -> Unit = {},
+    onShare: () -> Unit = {},
     header: @Composable () -> Unit,
     attributes: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -52,10 +54,10 @@ fun DetailTemplate(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onBookmark) {
                         Icon(Icons.Outlined.BookmarkBorder, contentDescription = "Bookmark")
                     }
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onShare) {
                         Icon(Icons.Default.Share, contentDescription = "Share")
                     }
                 },
