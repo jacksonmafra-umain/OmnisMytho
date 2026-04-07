@@ -5,10 +5,17 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.umain.omnismytho.presentation.ui.molecule.OmFilterChip
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -70,15 +77,30 @@ fun SearchPage(
             ) { s ->
                 when (s) {
                     is SearchState.Idle -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center,
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             Text(
-                                text = "Search for gods, demons, angels...",
+                                text = "RECENT SEARCHES",
+                                style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodyMedium,
+                                letterSpacing = 2.sp,
                             )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                listOf("Odin", "Anubis", "Lucifer").forEach { term ->
+                                    OmFilterChip(
+                                        label = term,
+                                        selected = false,
+                                        onClick = {
+                                            query = term
+                                            viewModel.emit(SearchEvent.OnQueryChanged(term))
+                                        },
+                                    )
+                                }
+                            }
                         }
                     }
 
@@ -87,12 +109,30 @@ fun SearchPage(
                     }
 
                     is SearchState.Results -> {
-                        SearchResults(
-                            entities = s.entities,
-                            onEntityClick = { id ->
-                                viewModel.emit(SearchEvent.OnEntityClicked(id))
-                            },
-                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            // Results count row
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Text(
+                                    text = "Results for \"${s.query}\"",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                Text(
+                                    text = "${s.entities.size} found",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            SearchResults(
+                                entities = s.entities,
+                                onEntityClick = { id ->
+                                    viewModel.emit(SearchEvent.OnEntityClicked(id))
+                                },
+                            )
+                        }
                     }
 
                     is SearchState.Empty -> {
@@ -124,8 +164,21 @@ private fun SearchPageIdlePreview() {
             onBack = {},
             searchBar = { OmSearchBar(query = "", onQueryChange = {}) },
             content = {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Search for gods, demons, angels...", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text(
+                        text = "RECENT SEARCHES",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        letterSpacing = 2.sp,
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf("Odin", "Anubis", "Lucifer").forEach { term ->
+                            OmFilterChip(label = term, selected = false, onClick = {})
+                        }
+                    }
                 }
             },
         )
