@@ -20,7 +20,13 @@
       "Bash(chmod +x /Users/jackson.mafra/Downloads/Projects/OmnisMytho/api/run_api.sh)",
       "Bash(xargs kill:*)",
       "Bash(./gradlew :composeApp:generateApiConfig :composeApp:compileDebugKotlinAndroid)",
-      "Bash(./gradlew :composeApp:generateApiConfig)"
+      "Bash(./gradlew :composeApp:generateApiConfig)",
+      "Bash(python data/scrape_and_generate.py --skip-images --mythology greek)",
+      "Bash(python data/scrape_and_generate.py --no-llm --skip-images)",
+      "Bash(python3 -c \":*)",
+      "Bash(python -c \"from data.loader import MYTHOLOGIES, ENTITIES; print\\(f''{len\\(MYTHOLOGIES\\)} mythologies, {len\\(ENTITIES\\)} entities''\\)\")",
+      "Bash(.venv/bin/python -c \"from data.loader import MYTHOLOGIES, ENTITIES; print\\(f''{len\\(MYTHOLOGIES\\)} mythologies, {len\\(ENTITIES\\)} entities''\\)\")",
+      "Bash(__NEW_LINE_1ff326e4b097dfe3__ git:*)"
     ]
   }
 }
