@@ -6,7 +6,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,16 +14,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.tooling.preview.Preview
 import com.umain.omnismytho.presentation.ui.organism.DetailAttributes
 import com.umain.omnismytho.presentation.ui.organism.DetailHeader
+import com.umain.omnismytho.presentation.ui.preview.OmPreviewSurface
+import com.umain.omnismytho.presentation.ui.preview.SampleData
 import com.umain.omnismytho.presentation.ui.template.DetailTemplate
 import com.umain.omnismytho.presentation.viewmodel.DetailEffect
 import com.umain.omnismytho.presentation.viewmodel.DetailEvent
 import com.umain.omnismytho.presentation.viewmodel.DetailState
 import com.umain.omnismytho.presentation.viewmodel.DetailViewModel
-import androidx.compose.ui.tooling.preview.Preview
-import com.umain.omnismytho.presentation.ui.preview.OmPreviewSurface
-import com.umain.omnismytho.presentation.ui.preview.SampleData
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -44,6 +43,9 @@ fun DetailPage(
         viewModel.effect.collect { effect ->
             when (effect) {
                 DetailEffect.NavigateBack -> onNavigateBack()
+                is DetailEffect.ShowSnackbar -> {
+                    scope.launch { snackbarHostState.showSnackbar(effect.message) }
+                }
             }
         }
     }
@@ -58,10 +60,7 @@ fun DetailPage(
                 DetailTemplate(
                     onBack = onNavigateBack,
                     header = {
-                        Text(
-                            "Loading...",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                        Text("Loading...", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     },
                     attributes = {},
                 )
@@ -70,8 +69,9 @@ fun DetailPage(
             is DetailState.Loaded -> {
                 DetailTemplate(
                     onBack = onNavigateBack,
-                    onBookmark = { scope.launch { snackbarHostState.showSnackbar("Bookmarked!") } },
+                    onBookmark = { viewModel.emit(DetailEvent.ToggleBookmark) },
                     onShare = { scope.launch { snackbarHostState.showSnackbar("Share coming soon") } },
+                    isBookmarked = s.isBookmarked,
                     snackbarHostState = snackbarHostState,
                     header = { DetailHeader(entity = s.entity) },
                     attributes = { DetailAttributes(entity = s.entity) },
