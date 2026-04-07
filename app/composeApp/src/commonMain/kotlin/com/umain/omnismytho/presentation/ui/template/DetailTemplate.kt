@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,6 +37,7 @@ fun DetailTemplate(
     onBack: () -> Unit,
     onBookmark: () -> Unit = {},
     onShare: () -> Unit = {},
+    isBookmarked: Boolean = false,
     snackbarHostState: SnackbarHostState = SnackbarHostState(),
     header: @Composable () -> Unit,
     attributes: @Composable () -> Unit,
@@ -59,7 +61,10 @@ fun DetailTemplate(
                 },
                 actions = {
                     IconButton(onClick = onBookmark) {
-                        Icon(Icons.Outlined.BookmarkBorder, contentDescription = "Bookmark")
+                        Icon(
+                            imageVector = if (isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                            contentDescription = if (isBookmarked) "Remove bookmark" else "Bookmark",
+                        )
                     }
                     IconButton(onClick = onShare) {
                         Icon(Icons.Default.Share, contentDescription = "Share")
