@@ -8,22 +8,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import com.umain.omnismytho.presentation.ui.organism.EntityGrid
 import com.umain.omnismytho.presentation.ui.organism.FilterBar
-import com.umain.omnismytho.presentation.ui.template.CatalogTemplate
-import com.umain.omnismytho.presentation.viewmodel.*
-import androidx.compose.ui.tooling.preview.Preview
 import com.umain.omnismytho.presentation.ui.preview.OmPreviewSurface
 import com.umain.omnismytho.presentation.ui.preview.SampleData
+import com.umain.omnismytho.presentation.ui.template.CatalogTemplate
+import com.umain.omnismytho.presentation.viewmodel.*
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun CatalogPage(
+fun CatalogAllPage(
     onNavigateToDetail: (String) -> Unit,
-    onNavigateBack: () -> Unit,
-    mythologyId: String = "",
-    viewModel: CatalogViewModel = koinViewModel { parametersOf(mythologyId) },
+    viewModel: CatalogViewModel = koinViewModel { parametersOf("") },
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -37,8 +35,8 @@ fun CatalogPage(
     }
 
     CatalogTemplate(
-        title = "Catalog",
-        onBack = onNavigateBack,
+        title = "All Entities",
+        onBack = {},
         filterBar = {
             FilterBar(
                 selectedType = (state as? CatalogState.Loaded)?.currentFilter,
@@ -71,15 +69,13 @@ fun CatalogPage(
 
 @Preview
 @Composable
-private fun CatalogPagePreview() {
+private fun CatalogAllPagePreview() {
     OmPreviewSurface {
         CatalogTemplate(
-            title = "Greek Mythology",
+            title = "All Entities",
             onBack = {},
             filterBar = { FilterBar(selectedType = null, onFilterChanged = {}) },
-            content = {
-                EntityGrid(entities = SampleData.entities, onEntityClick = {})
-            },
+            content = { EntityGrid(entities = SampleData.entities, onEntityClick = {}) },
         )
     }
 }

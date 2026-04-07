@@ -7,9 +7,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.umain.omnismytho.domain.model.Mythology
 import com.umain.omnismytho.presentation.ui.molecule.MythologyCard
+import com.umain.omnismytho.presentation.ui.preview.OmPreviewSurface
+import com.umain.omnismytho.presentation.ui.preview.SampleData
 
 @Composable
 fun MythologyGrid(
@@ -28,7 +31,16 @@ fun MythologyGrid(
             MythologyCard(
                 mythology = mythology,
                 onClick = { onMythologyClick(mythology.id) },
+                modifier = Modifier.animateItem(),
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun MythologyGridPreview() {
+    OmPreviewSurface {
+        MythologyGrid(mythologies = SampleData.mythologies, onMythologyClick = {})
     }
 }

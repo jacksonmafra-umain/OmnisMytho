@@ -10,9 +10,15 @@ sealed interface Route {
     data object Home : Route
 
     @Serializable
+    data object CatalogAll : Route
+
+    @Serializable
     data class Catalog(
         val mythologyId: String,
     ) : Route
+
+    @Serializable
+    data object Saved : Route
 
     @Serializable
     data class Detail(

@@ -1,18 +1,29 @@
 package com.umain.omnismytho.presentation.ui.molecule
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.umain.omnismytho.domain.model.Entity
 import com.umain.omnismytho.presentation.ui.atom.OmTypeBadge
+import com.umain.omnismytho.presentation.ui.preview.OmPreviewSurface
+import com.umain.omnismytho.presentation.ui.preview.SampleData
 
 @Composable
 fun EntityListItem(
@@ -58,4 +69,30 @@ fun EntityListItem(
             modifier = Modifier.size(20.dp),
         )
     }
+}
+
+// ── Previews ────────────────────────────────────────────────────────────────
+
+@Preview
+@Composable
+private fun EntityListItemPreview() {
+    OmPreviewSurface { EntityListItem(entity = SampleData.entity, onClick = {}) }
+}
+
+@Preview
+@Composable
+private fun EntityListItemLargeTextPreview() {
+    OmPreviewSurface {
+        CompositionLocalProvider(
+            LocalDensity provides Density(LocalDensity.current.density, fontScale = 1.5f),
+        ) {
+            EntityListItem(entity = SampleData.entity, onClick = {})
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun EntityListItemLandscapePreview() {
+    OmPreviewSurface { EntityListItem(entity = SampleData.entity, onClick = {}) }
 }

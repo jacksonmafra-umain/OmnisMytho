@@ -1,16 +1,23 @@
 package com.umain.omnismytho.presentation.ui.atom
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.umain.omnismytho.domain.model.Alignment
 import com.umain.omnismytho.domain.model.EntityType
+import com.umain.omnismytho.presentation.ui.preview.OmPreviewSurface
 
 @Composable
 fun OmTypeBadge(
@@ -55,4 +62,67 @@ fun OmAlignmentBadge(
         color = textColor,
         style = MaterialTheme.typography.labelSmall,
     )
+}
+
+// ── Previews ────────────────────────────────────────────────────────────────
+
+@Preview
+@Composable
+private fun OmTypeBadgePreview() {
+    OmPreviewSurface {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            EntityType.entries.forEach { OmTypeBadge(type = it) }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun OmTypeBadgeLargeTextPreview() {
+    OmPreviewSurface {
+        CompositionLocalProvider(
+            LocalDensity provides Density(LocalDensity.current.density, fontScale = 1.5f),
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                EntityType.entries.forEach { OmTypeBadge(type = it) }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun OmAlignmentBadgePreview() {
+    OmPreviewSurface {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Alignment.entries.forEach { OmAlignmentBadge(alignment = it) }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun OmAlignmentBadgeLargeTextPreview() {
+    OmPreviewSurface {
+        CompositionLocalProvider(
+            LocalDensity provides Density(LocalDensity.current.density, fontScale = 1.5f),
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Alignment.entries.forEach { OmAlignmentBadge(alignment = it) }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun OmBadgeLandscapePreview() {
+    OmPreviewSurface {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OmTypeBadge(type = EntityType.GOD)
+            OmTypeBadge(type = EntityType.DEMON)
+            OmAlignmentBadge(alignment = Alignment.GOOD)
+            OmAlignmentBadge(alignment = Alignment.EVIL)
+        }
+    }
 }

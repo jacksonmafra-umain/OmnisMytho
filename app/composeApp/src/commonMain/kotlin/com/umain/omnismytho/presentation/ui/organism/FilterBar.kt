@@ -5,9 +5,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.umain.omnismytho.domain.model.EntityType
 import com.umain.omnismytho.presentation.ui.molecule.OmFilterChip
+import com.umain.omnismytho.presentation.ui.preview.OmPreviewSurface
 
 @Composable
 fun FilterBar(
@@ -36,5 +38,21 @@ fun FilterBar(
                 onClick = { onFilterChanged(type) },
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun FilterBarPreview() {
+    OmPreviewSurface {
+        FilterBar(selectedType = EntityType.GOD, onFilterChanged = {})
+    }
+}
+
+@Preview
+@Composable
+private fun FilterBarNoneSelectedPreview() {
+    OmPreviewSurface {
+        FilterBar(selectedType = null, onFilterChanged = {})
     }
 }

@@ -18,7 +18,7 @@ kotlin {
 
     listOf(
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
@@ -41,7 +41,7 @@ kotlin {
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
             implementation(libs.compose.uiToolingPreview)
-            implementation(libs.androidx.material.icons.extended)
+            implementation(compose.materialIconsExtended)
 
             // Lifecycle
             implementation(libs.androidx.lifecycle.viewmodelCompose)
@@ -85,12 +85,21 @@ kotlin {
 
 android {
     namespace = "com.umain.omnismytho"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk =
+        libs.versions.android.compileSdk
+            .get()
+            .toInt()
 
     defaultConfig {
         applicationId = "com.umain.omnismytho"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
+        targetSdk =
+            libs.versions.android.targetSdk
+                .get()
+                .toInt()
         versionCode = 1
         versionName = "1.0"
     }
@@ -119,7 +128,8 @@ dependencies {
 // re-runs whenever the property changes, including after ngrok restarts.
 val generateApiConfig by tasks.registering {
     val propsFile = rootProject.file("gradle.properties")
-    val outputDir = layout.buildDirectory.dir("generated/apiconfig/com/umain/omnismytho/data/remote")
+    val outputDir =
+        layout.buildDirectory.dir("generated/apiconfig/com/umain/omnismytho/data/remote")
 
     inputs.file(propsFile)
     outputs.dir(outputDir)
@@ -143,7 +153,7 @@ val generateApiConfig by tasks.registering {
             |object ApiConfig {
             |    const val BASE_URL = "$baseUrl"
             |}
-            """.trimMargin()
+            """.trimMargin(),
         )
         println("ApiConfig.BASE_URL = $baseUrl")
     }

@@ -1,11 +1,22 @@
 package com.umain.omnismytho.presentation.ui.template
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.umain.omnismytho.presentation.ui.molecule.OmSearchBar
+import com.umain.omnismytho.presentation.ui.organism.MythologyGrid
+import com.umain.omnismytho.presentation.ui.preview.OmPreviewSurface
+import com.umain.omnismytho.presentation.ui.preview.SampleData
 import com.umain.omnismytho.presentation.ui.theme.LocalSpacing
 
 @Composable
@@ -17,13 +28,14 @@ fun HomeTemplate(
     val spacing = LocalSpacing.current
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = spacing.md),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(horizontal = spacing.md)
+                .padding(top = spacing.md),
         verticalArrangement = Arrangement.spacedBy(spacing.lg),
     ) {
-        Spacer(Modifier.height(spacing.sm))
-
         // Header
         Column(verticalArrangement = Arrangement.spacedBy(spacing.sm)) {
             Text(
@@ -65,5 +77,18 @@ fun HomeTemplate(
         }
 
         mythologyGrid()
+    }
+}
+
+@Preview
+@Composable
+private fun HomeTemplatePreview() {
+    OmPreviewSurface {
+        HomeTemplate(
+            searchBar = { OmSearchBar(query = "", onQueryChange = {}) },
+            mythologyGrid = {
+                MythologyGrid(mythologies = SampleData.mythologies, onMythologyClick = {})
+            },
+        )
     }
 }

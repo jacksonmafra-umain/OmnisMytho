@@ -12,6 +12,9 @@ import com.umain.omnismytho.presentation.ui.molecule.OmSearchBar
 import com.umain.omnismytho.presentation.ui.organism.MythologyGrid
 import com.umain.omnismytho.presentation.ui.template.HomeTemplate
 import com.umain.omnismytho.presentation.viewmodel.*
+import androidx.compose.ui.tooling.preview.Preview
+import com.umain.omnismytho.presentation.ui.preview.OmPreviewSurface
+import com.umain.omnismytho.presentation.ui.preview.SampleData
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -69,4 +72,21 @@ fun HomePage(
             }
         },
     )
+}
+
+@Preview
+@Composable
+private fun HomePagePreview() {
+    OmPreviewSurface {
+        HomeTemplate(
+            searchBar = { OmSearchBar(query = "", onQueryChange = {}) },
+            mythologyGrid = {
+                MythologyGrid(
+                    mythologies = SampleData.mythologies,
+                    onMythologyClick = {},
+                    modifier = Modifier.fillMaxSize(),
+                )
+            },
+        )
+    }
 }
