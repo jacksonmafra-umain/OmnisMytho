@@ -19,6 +19,8 @@ sealed interface CatalogEvent : RevolverEvent {
     ) : CatalogEvent
 
     data object LoadNextPage : CatalogEvent
+
+    data object OnToggleSort : CatalogEvent
 }
 
 sealed interface CatalogState : RevolverState {
@@ -30,6 +32,7 @@ sealed interface CatalogState : RevolverState {
         val currentFilter: EntityType? = null,
         val hasMore: Boolean = false,
         val currentPage: Int = 1,
+        val sortAscending: Boolean = true,
     ) : CatalogState
 
     data class Error(
