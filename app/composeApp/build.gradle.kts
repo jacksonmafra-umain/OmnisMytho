@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -111,4 +112,35 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+}
+
+// ── Generate ApiConfig.kt from gradle.properties ────────────────────────────
+val generateApiConfig by tasks.registering {
+    val baseUrl = providers.gradleProperty("api.baseUrl")
+        .getOrElse("http://10.0.2.2:8000/api/v1")
+    val outputDir = layout.buildDirectory.dir("generated/apiconfig/com/umain/omnismytho/data/remote")
+
+    outputs.dir(outputDir)
+
+    doLast {
+        val dir = outputDir.get().asFile
+        dir.mkdirs()
+        dir.resolve("ApiConfig.kt").writeText(
+            """
+            |package com.umain.omnismytho.data.remote
+            |
+            |/**
+            | * Auto-generated from gradle.properties — do not edit manually.
+            | * Updated by api/run_api.sh when ngrok starts.
+            | */
+            |object ApiConfig {
+            |    const val BASE_URL = "$baseUrl"
+            |}
+            """.trimMargin()
+        )
+    }
+}
+
+kotlin.sourceSets.commonMain {
+    kotlin.srcDir(generateApiConfig.map { layout.buildDirectory.dir("generated/apiconfig") })
 }
