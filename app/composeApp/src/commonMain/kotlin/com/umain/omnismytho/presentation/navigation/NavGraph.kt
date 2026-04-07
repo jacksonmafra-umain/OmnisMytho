@@ -83,7 +83,11 @@ fun AppNavGraph(navController: NavHostController) {
             )
         }
         composable<Route.Saved> {
-            SavedPage()
+            SavedPage(
+                onNavigateToDetail = { entityId ->
+                    navController.navigate(Route.Detail(entityId))
+                },
+            )
         }
     }
 }
