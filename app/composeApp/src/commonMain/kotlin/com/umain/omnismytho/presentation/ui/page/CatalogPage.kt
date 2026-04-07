@@ -37,7 +37,8 @@ fun CatalogPage(
     }
 
     CatalogTemplate(
-        title = "Catalog",
+        title = mythologyId.replaceFirstChar { it.uppercase() } + " Mythology",
+        subtitle = if (state is CatalogState.Loaded) "${(state as CatalogState.Loaded).entities.size} entities found" else "",
         onBack = onNavigateBack,
         filterBar = {
             FilterBar(
