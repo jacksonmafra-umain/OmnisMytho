@@ -1,5 +1,6 @@
 package com.umain.omnismytho.presentation.ui.template
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,7 +35,9 @@ import com.umain.omnismytho.presentation.ui.theme.LocalSpacing
 fun CatalogTemplate(
     title: String,
     subtitle: String = "",
+    sortLabel: String = "A-Z",
     onBack: () -> Unit,
+    onSort: () -> Unit = {},
     filterBar: @Composable () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -92,6 +95,7 @@ fun CatalogTemplate(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { onSort() },
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Sort,
@@ -100,7 +104,7 @@ fun CatalogTemplate(
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Text(
-                            text = "A-Z",
+                            text = sortLabel,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
