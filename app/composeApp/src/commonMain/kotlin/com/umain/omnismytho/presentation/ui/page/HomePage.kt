@@ -49,6 +49,7 @@ fun HomePage(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+
                 is HomeState.Loaded -> {
                     MythologyGrid(
                         mythologies = s.mythologies,
@@ -58,6 +59,7 @@ fun HomePage(
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
+
                 is HomeState.Error -> {
                     Text(
                         text = s.message,

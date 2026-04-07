@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.umain.omnismytho.presentation.ui.theme.LocalSpacing
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailTemplate(
     onBack: () -> Unit,
@@ -42,21 +43,23 @@ fun DetailTemplate(
                         Icon(Icons.Default.Share, contentDescription = "Share")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                    actionIconContentColor = MaterialTheme.colorScheme.onBackground,
-                ),
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                        actionIconContentColor = MaterialTheme.colorScheme.onBackground,
+                    ),
             )
         },
         modifier = modifier,
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = spacing.md)
-                .verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = spacing.md)
+                    .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(spacing.lg),
         ) {
             header()

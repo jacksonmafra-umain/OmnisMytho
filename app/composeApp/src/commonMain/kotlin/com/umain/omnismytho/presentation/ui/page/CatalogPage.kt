@@ -8,9 +8,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.toRoute
-import com.umain.omnismytho.presentation.navigation.Route
 import com.umain.omnismytho.presentation.ui.organism.EntityGrid
 import com.umain.omnismytho.presentation.ui.organism.FilterBar
 import com.umain.omnismytho.presentation.ui.template.CatalogTemplate
@@ -22,12 +19,8 @@ import org.koin.core.parameter.parametersOf
 fun CatalogPage(
     onNavigateToDetail: (String) -> Unit,
     onNavigateBack: () -> Unit,
-    backStackEntry: NavBackStackEntry? = null,
-    viewModel: CatalogViewModel = run {
-        // Get mythology ID from navigation args
-        val mythologyId = backStackEntry?.toRoute<Route.Catalog>()?.mythologyId ?: ""
-        koinViewModel { parametersOf(mythologyId) }
-    },
+    mythologyId: String = "",
+    viewModel: CatalogViewModel = koinViewModel { parametersOf(mythologyId) },
 ) {
     val state by viewModel.state.collectAsState()
 

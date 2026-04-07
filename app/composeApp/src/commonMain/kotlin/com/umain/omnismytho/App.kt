@@ -4,14 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
 import com.umain.omnismytho.presentation.navigation.AppNavGraph
 import com.umain.omnismytho.presentation.ui.theme.OmnisMythoTheme
-import org.koin.compose.KoinContext
 
 @Composable
 fun App() {
-    KoinContext {
-        OmnisMythoTheme {
-            val navController = rememberNavController()
-            AppNavGraph(navController = navController)
-        }
+    OmnisMythoTheme {
+        val navController = rememberNavController()
+        AppNavGraph(navController = navController)
     }
 }

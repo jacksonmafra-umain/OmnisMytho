@@ -8,8 +8,8 @@ import kotlinx.coroutines.delay
 class SearchViewModel(
     private val entityRepository: EntityRepository,
 ) : RevolverViewModel<SearchEvent, SearchState, SearchEffect>(
-    initialState = SearchState.Idle
-) {
+        initialState = SearchState.Idle,
+    ) {
     private var searchJob: Job? = null
 
     init {

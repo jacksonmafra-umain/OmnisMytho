@@ -22,10 +22,11 @@ fun HomeTemplate(
         modifier = modifier,
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = spacing.md),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = spacing.md),
             verticalArrangement = Arrangement.spacedBy(spacing.lg),
         ) {
             Spacer(Modifier.height(spacing.sm))

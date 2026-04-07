@@ -9,13 +9,21 @@ import com.umain.revolver.RevolverState
 
 sealed interface CatalogEvent : RevolverEvent {
     data object LoadEntities : CatalogEvent
-    data class OnFilterChanged(val type: EntityType?) : CatalogEvent
-    data class OnEntityClicked(val entityId: String) : CatalogEvent
+
+    data class OnFilterChanged(
+        val type: EntityType?,
+    ) : CatalogEvent
+
+    data class OnEntityClicked(
+        val entityId: String,
+    ) : CatalogEvent
+
     data object LoadNextPage : CatalogEvent
 }
 
 sealed interface CatalogState : RevolverState {
     data object Loading : CatalogState
+
     data class Loaded(
         val entities: List<Entity>,
         val mythology: Mythology? = null,
@@ -23,9 +31,14 @@ sealed interface CatalogState : RevolverState {
         val hasMore: Boolean = false,
         val currentPage: Int = 1,
     ) : CatalogState
-    data class Error(val message: String) : CatalogState
+
+    data class Error(
+        val message: String,
+    ) : CatalogState
 }
 
 sealed interface CatalogEffect : RevolverEffect {
-    data class NavigateToDetail(val entityId: String) : CatalogEffect
+    data class NavigateToDetail(
+        val entityId: String,
+    ) : CatalogEffect
 }

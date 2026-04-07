@@ -17,10 +17,11 @@ fun OmPrimaryButton(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
         shape = MaterialTheme.shapes.medium,
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
     ) {
@@ -37,9 +38,10 @@ fun OmOutlinedButton(
     OutlinedButton(
         onClick = onClick,
         modifier = modifier,
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = MaterialTheme.colorScheme.primary,
-        ),
+        colors =
+            ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.primary,
+            ),
         shape = MaterialTheme.shapes.medium,
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
     ) {

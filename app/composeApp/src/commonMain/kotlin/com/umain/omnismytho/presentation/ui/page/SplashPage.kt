@@ -14,9 +14,7 @@ import com.umain.omnismytho.presentation.ui.atom.OmDivider
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashPage(
-    onNavigateToHome: () -> Unit,
-) {
+fun SplashPage(onNavigateToHome: () -> Unit) {
     LaunchedEffect(Unit) {
         delay(2000)
         onNavigateToHome()

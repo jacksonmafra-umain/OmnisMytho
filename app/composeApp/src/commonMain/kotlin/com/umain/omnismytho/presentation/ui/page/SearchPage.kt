@@ -59,9 +59,11 @@ fun SearchPage(
                         )
                     }
                 }
+
                 is SearchState.Searching -> {
                     Text("Searching...", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
+
                 is SearchState.Results -> {
                     SearchResults(
                         entities = s.entities,
@@ -70,6 +72,7 @@ fun SearchPage(
                         },
                     )
                 }
+
                 is SearchState.Empty -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -81,6 +84,7 @@ fun SearchPage(
                         )
                     }
                 }
+
                 is SearchState.Error -> {
                     Text(s.message, color = MaterialTheme.colorScheme.error)
                 }

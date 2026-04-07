@@ -6,7 +6,8 @@ import com.umain.omnismytho.domain.repository.EntityRepository
 import com.umain.omnismytho.domain.repository.MythologyRepository
 import org.koin.dsl.module
 
-val repositoryModule = module {
-    single<MythologyRepository> { MythologyRepositoryImpl(get()) }
-    single<EntityRepository> { EntityRepositoryImpl(get()) }
-}
+val repositoryModule =
+    module {
+        single<MythologyRepository> { MythologyRepositoryImpl(get()) }
+        single<EntityRepository> { EntityRepositoryImpl(get()) }
+    }

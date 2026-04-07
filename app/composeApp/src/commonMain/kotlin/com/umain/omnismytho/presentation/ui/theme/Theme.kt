@@ -7,43 +7,45 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 
-private val DarkColorScheme = darkColorScheme(
-    primary = DarkColorPrimary,
-    secondary = DarkColorSecondary,
-    tertiary = DarkColorAccent,
-    background = DarkBgPrimary,
-    surface = DarkBgSurface,
-    surfaceVariant = DarkBgCard,
-    onPrimary = DarkBgPrimary,
-    onSecondary = DarkBgPrimary,
-    onTertiary = DarkBgPrimary,
-    onBackground = DarkTextPrimary,
-    onSurface = DarkTextPrimary,
-    onSurfaceVariant = DarkTextSecondary,
-    outline = DarkBorder,
-    outlineVariant = DarkBorderSubtle,
-    error = DarkError,
-    onError = DarkBgPrimary,
-)
+private val DarkColorScheme =
+    darkColorScheme(
+        primary = DarkColorPrimary,
+        secondary = DarkColorSecondary,
+        tertiary = DarkColorAccent,
+        background = DarkBgPrimary,
+        surface = DarkBgSurface,
+        surfaceVariant = DarkBgCard,
+        onPrimary = DarkBgPrimary,
+        onSecondary = DarkBgPrimary,
+        onTertiary = DarkBgPrimary,
+        onBackground = DarkTextPrimary,
+        onSurface = DarkTextPrimary,
+        onSurfaceVariant = DarkTextSecondary,
+        outline = DarkBorder,
+        outlineVariant = DarkBorderSubtle,
+        error = DarkError,
+        onError = DarkBgPrimary,
+    )
 
-private val LightColorScheme = lightColorScheme(
-    primary = LightColorPrimary,
-    secondary = LightColorSecondary,
-    tertiary = LightColorAccent,
-    background = LightBgPrimary,
-    surface = LightBgSurface,
-    surfaceVariant = LightBgCard,
-    onPrimary = LightBgPrimary,
-    onSecondary = LightBgPrimary,
-    onTertiary = LightBgPrimary,
-    onBackground = LightTextPrimary,
-    onSurface = LightTextPrimary,
-    onSurfaceVariant = LightTextSecondary,
-    outline = LightBorder,
-    outlineVariant = LightBorderSubtle,
-    error = LightError,
-    onError = LightBgPrimary,
-)
+private val LightColorScheme =
+    lightColorScheme(
+        primary = LightColorPrimary,
+        secondary = LightColorSecondary,
+        tertiary = LightColorAccent,
+        background = LightBgPrimary,
+        surface = LightBgSurface,
+        surfaceVariant = LightBgCard,
+        onPrimary = LightBgPrimary,
+        onSecondary = LightBgPrimary,
+        onTertiary = LightBgPrimary,
+        onBackground = LightTextPrimary,
+        onSurface = LightTextPrimary,
+        onSurfaceVariant = LightTextSecondary,
+        outline = LightBorder,
+        outlineVariant = LightBorderSubtle,
+        error = LightError,
+        onError = LightBgPrimary,
+    )
 
 @Composable
 fun OmnisMythoTheme(

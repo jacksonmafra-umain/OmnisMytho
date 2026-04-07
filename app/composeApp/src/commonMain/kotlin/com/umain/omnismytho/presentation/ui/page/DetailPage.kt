@@ -6,9 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.toRoute
-import com.umain.omnismytho.presentation.navigation.Route
 import com.umain.omnismytho.presentation.ui.organism.DetailAttributes
 import com.umain.omnismytho.presentation.ui.organism.DetailHeader
 import com.umain.omnismytho.presentation.ui.template.DetailTemplate
@@ -19,11 +16,8 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun DetailPage(
     onNavigateBack: () -> Unit,
-    backStackEntry: NavBackStackEntry? = null,
-    viewModel: DetailViewModel = run {
-        val entityId = backStackEntry?.toRoute<Route.Detail>()?.entityId ?: ""
-        koinViewModel { parametersOf(entityId) }
-    },
+    entityId: String = "",
+    viewModel: DetailViewModel = koinViewModel { parametersOf(entityId) },
 ) {
     val state by viewModel.state.collectAsState()
 

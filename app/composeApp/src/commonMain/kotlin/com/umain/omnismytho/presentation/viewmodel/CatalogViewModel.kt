@@ -8,20 +8,65 @@ class CatalogViewModel(
     private val mythologyId: String,
     private val entityRepository: EntityRepository,
 ) : RevolverViewModel<CatalogEvent, CatalogState, CatalogEffect>(
-    initialState = CatalogState.Loading
+    initialState = CatalogState.Loading,
 ) {
     private var currentFilter: EntityType? = null
+    private var currentPage: Int = 1
+    private var currentEntities: List<com.umain.omnismytho.domain.model.Entity> = emptyList()
+    private var hasMore: Boolean = false
 
     init {
         addEventHandler<CatalogEvent.LoadEntities> { _, emit ->
             emit.state(CatalogState.Loading)
-            loadEntities(emit, page = 1)
+            currentPage = 1
+            currentEntities = emptyList()
+            try {
+                val result = entityRepository.getEntities(
+                    mythologyId = mythologyId,
+                    type = currentFilter,
+                    page = 1,
+                )
+                currentEntities = result.items
+                hasMore = 1 < result.totalPages
+                currentPage = 1
+                emit.state(
+                    CatalogState.Loaded(
+                        entities = currentEntities,
+                        currentFilter = currentFilter,
+                        hasMore = hasMore,
+                        currentPage = currentPage,
+                    ),
+                )
+            } catch (e: Exception) {
+                emit.state(CatalogState.Error(e.message ?: "Failed to load entities"))
+            }
         }
 
         addEventHandler<CatalogEvent.OnFilterChanged> { event, emit ->
             currentFilter = event.type
             emit.state(CatalogState.Loading)
-            loadEntities(emit, page = 1)
+            currentPage = 1
+            currentEntities = emptyList()
+            try {
+                val result = entityRepository.getEntities(
+                    mythologyId = mythologyId,
+                    type = currentFilter,
+                    page = 1,
+                )
+                currentEntities = result.items
+                hasMore = 1 < result.totalPages
+                currentPage = 1
+                emit.state(
+                    CatalogState.Loaded(
+                        entities = currentEntities,
+                        currentFilter = currentFilter,
+                        hasMore = hasMore,
+                        currentPage = currentPage,
+                    ),
+                )
+            } catch (e: Exception) {
+                emit.state(CatalogState.Error(e.message ?: "Failed to load entities"))
+            }
         }
 
         addEventHandler<CatalogEvent.OnEntityClicked> { event, emit ->
@@ -29,39 +74,29 @@ class CatalogViewModel(
         }
 
         addEventHandler<CatalogEvent.LoadNextPage> { _, emit ->
-            val current = state.value
-            if (current is CatalogState.Loaded && current.hasMore) {
-                loadEntities(emit, page = current.currentPage + 1, appendTo = current)
+            if (hasMore) {
+                val nextPage = currentPage + 1
+                try {
+                    val result = entityRepository.getEntities(
+                        mythologyId = mythologyId,
+                        type = currentFilter,
+                        page = nextPage,
+                    )
+                    currentEntities = currentEntities + result.items
+                    hasMore = nextPage < result.totalPages
+                    currentPage = nextPage
+                    emit.state(
+                        CatalogState.Loaded(
+                            entities = currentEntities,
+                            currentFilter = currentFilter,
+                            hasMore = hasMore,
+                            currentPage = currentPage,
+                        ),
+                    )
+                } catch (e: Exception) {
+                    emit.state(CatalogState.Error(e.message ?: "Failed to load more"))
+                }
             }
-        }
-    }
-
-    private suspend fun loadEntities(
-        emit: Emit,
-        page: Int,
-        appendTo: CatalogState.Loaded? = null,
-    ) {
-        try {
-            val result = entityRepository.getEntities(
-                mythologyId = mythologyId,
-                type = currentFilter,
-                page = page,
-            )
-            val entities = if (appendTo != null) {
-                appendTo.entities + result.items
-            } else {
-                result.items
-            }
-            emit.state(
-                CatalogState.Loaded(
-                    entities = entities,
-                    currentFilter = currentFilter,
-                    hasMore = page < result.totalPages,
-                    currentPage = page,
-                )
-            )
-        } catch (e: Exception) {
-            emit.state(CatalogState.Error(e.message ?: "Failed to load entities"))
         }
     }
 }

@@ -7,8 +7,8 @@ class DetailViewModel(
     private val entityId: String,
     private val entityRepository: EntityRepository,
 ) : RevolverViewModel<DetailEvent, DetailState, DetailEffect>(
-    initialState = DetailState.Loading
-) {
+        initialState = DetailState.Loading,
+    ) {
     init {
         addEventHandler<DetailEvent.LoadEntity> { _, emit ->
             emit.state(DetailState.Loading)

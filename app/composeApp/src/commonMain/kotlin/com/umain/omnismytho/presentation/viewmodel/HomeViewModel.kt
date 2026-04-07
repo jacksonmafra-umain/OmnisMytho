@@ -6,8 +6,8 @@ import com.umain.revolver.RevolverViewModel
 class HomeViewModel(
     private val mythologyRepository: MythologyRepository,
 ) : RevolverViewModel<HomeEvent, HomeState, HomeEffect>(
-    initialState = HomeState.Loading
-) {
+        initialState = HomeState.Loading,
+    ) {
     init {
         addEventHandler<HomeEvent.LoadMythologies> { _, emit ->
             emit.state(HomeState.Loading)

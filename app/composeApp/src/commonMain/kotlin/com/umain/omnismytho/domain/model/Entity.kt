@@ -15,27 +15,31 @@ data class Entity(
     val imagePrompt: String,
 )
 
-enum class EntityType(val displayName: String) {
+enum class EntityType(
+    val displayName: String,
+) {
     GOD("God"),
     DEMON("Demon"),
     ANGEL("Angel"),
     SPIRIT("Spirit"),
-    CREATURE("Creature");
+    CREATURE("Creature"),
+    ;
 
     companion object {
-        fun fromString(value: String): EntityType =
-            entries.firstOrNull { it.name.equals(value, ignoreCase = true) } ?: GOD
+        fun fromString(value: String): EntityType = entries.firstOrNull { it.name.equals(value, ignoreCase = true) } ?: GOD
     }
 }
 
-enum class Alignment(val displayName: String) {
+enum class Alignment(
+    val displayName: String,
+) {
     GOOD("Good"),
     NEUTRAL("Neutral"),
     EVIL("Evil"),
-    CHAOTIC("Chaotic");
+    CHAOTIC("Chaotic"),
+    ;
 
     companion object {
-        fun fromString(value: String): Alignment =
-            entries.firstOrNull { it.name.equals(value, ignoreCase = true) } ?: NEUTRAL
+        fun fromString(value: String): Alignment = entries.firstOrNull { it.name.equals(value, ignoreCase = true) } ?: NEUTRAL
     }
 }

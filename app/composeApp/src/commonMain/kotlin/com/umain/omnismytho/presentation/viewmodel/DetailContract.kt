@@ -11,8 +11,14 @@ sealed interface DetailEvent : RevolverEvent {
 
 sealed interface DetailState : RevolverState {
     data object Loading : DetailState
-    data class Loaded(val entity: Entity) : DetailState
-    data class Error(val message: String) : DetailState
+
+    data class Loaded(
+        val entity: Entity,
+    ) : DetailState
+
+    data class Error(
+        val message: String,
+    ) : DetailState
 }
 
 sealed interface DetailEffect : RevolverEffect {

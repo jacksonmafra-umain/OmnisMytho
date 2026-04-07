@@ -15,14 +15,15 @@ fun FilterBar(
     onFilterChanged: (EntityType?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val filters = listOf<Pair<String, EntityType?>>(
-        "All" to null,
-        "Gods" to EntityType.GOD,
-        "Demons" to EntityType.DEMON,
-        "Angels" to EntityType.ANGEL,
-        "Spirits" to EntityType.SPIRIT,
-        "Creatures" to EntityType.CREATURE,
-    )
+    val filters =
+        listOf<Pair<String, EntityType?>>(
+            "All" to null,
+            "Gods" to EntityType.GOD,
+            "Demons" to EntityType.DEMON,
+            "Angels" to EntityType.ANGEL,
+            "Spirits" to EntityType.SPIRIT,
+            "Creatures" to EntityType.CREATURE,
+        )
 
     LazyRow(
         modifier = modifier,

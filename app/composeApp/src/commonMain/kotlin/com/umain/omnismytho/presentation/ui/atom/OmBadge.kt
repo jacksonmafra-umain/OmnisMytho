@@ -17,13 +17,14 @@ fun OmTypeBadge(
     type: EntityType,
     modifier: Modifier = Modifier,
 ) {
-    val color = when (type) {
-        EntityType.GOD -> MaterialTheme.colorScheme.primary
-        EntityType.DEMON -> Color(0xFF8B3A2A)
-        EntityType.ANGEL -> Color(0xFFD4A43C)
-        EntityType.SPIRIT -> MaterialTheme.colorScheme.tertiary
-        EntityType.CREATURE -> MaterialTheme.colorScheme.secondary
-    }
+    val color =
+        when (type) {
+            EntityType.GOD -> MaterialTheme.colorScheme.primary
+            EntityType.DEMON -> Color(0xFF8B3A2A)
+            EntityType.ANGEL -> Color(0xFFD4A43C)
+            EntityType.SPIRIT -> MaterialTheme.colorScheme.tertiary
+            EntityType.CREATURE -> MaterialTheme.colorScheme.secondary
+        }
     Text(
         text = type.displayName,
         modifier = modifier,
@@ -37,18 +38,20 @@ fun OmAlignmentBadge(
     alignment: Alignment,
     modifier: Modifier = Modifier,
 ) {
-    val (bgColor, textColor) = when (alignment) {
-        Alignment.GOOD -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) to MaterialTheme.colorScheme.primary
-        Alignment.NEUTRAL -> MaterialTheme.colorScheme.outline.copy(alpha = 0.2f) to MaterialTheme.colorScheme.onSurfaceVariant
-        Alignment.EVIL -> Color(0xFF8B3A2A).copy(alpha = 0.15f) to Color(0xFF8B3A2A)
-        Alignment.CHAOTIC -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f) to MaterialTheme.colorScheme.tertiary
-    }
+    val (bgColor, textColor) =
+        when (alignment) {
+            Alignment.GOOD -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) to MaterialTheme.colorScheme.primary
+            Alignment.NEUTRAL -> MaterialTheme.colorScheme.outline.copy(alpha = 0.2f) to MaterialTheme.colorScheme.onSurfaceVariant
+            Alignment.EVIL -> Color(0xFF8B3A2A).copy(alpha = 0.15f) to Color(0xFF8B3A2A)
+            Alignment.CHAOTIC -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f) to MaterialTheme.colorScheme.tertiary
+        }
     Text(
         text = alignment.displayName,
-        modifier = modifier
-            .clip(MaterialTheme.shapes.extraSmall)
-            .background(bgColor)
-            .padding(horizontal = 8.dp, vertical = 2.dp),
+        modifier =
+            modifier
+                .clip(MaterialTheme.shapes.extraSmall)
+                .background(bgColor)
+                .padding(horizontal = 8.dp, vertical = 2.dp),
         color = textColor,
         style = MaterialTheme.typography.labelSmall,
     )

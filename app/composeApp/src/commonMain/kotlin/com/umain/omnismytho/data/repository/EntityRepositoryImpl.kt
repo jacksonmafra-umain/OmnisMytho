@@ -8,7 +8,6 @@ import com.umain.omnismytho.domain.repository.EntityRepository
 class EntityRepositoryImpl(
     private val apiService: ApiService,
 ) : EntityRepository {
-
     override suspend fun getEntities(
         mythologyId: String?,
         type: EntityType?,
@@ -16,17 +15,19 @@ class EntityRepositoryImpl(
         page: Int,
         pageSize: Int,
     ): PaginatedResult<Entity> =
-        apiService.getEntities(
-            mythologyId = mythologyId,
-            type = type?.name?.lowercase(),
-            alignment = alignment?.name?.lowercase(),
-            page = page,
-            pageSize = pageSize,
-        ).toDomain()
+        apiService
+            .getEntities(
+                mythologyId = mythologyId,
+                type = type?.name?.lowercase(),
+                alignment = alignment?.name?.lowercase(),
+                page = page,
+                pageSize = pageSize,
+            ).toDomain()
 
-    override suspend fun searchEntities(query: String, limit: Int): List<Entity> =
-        apiService.searchEntities(query, limit).map { it.toDomain() }
+    override suspend fun searchEntities(
+        query: String,
+        limit: Int,
+    ): List<Entity> = apiService.searchEntities(query, limit).map { it.toDomain() }
 
-    override suspend fun getEntity(id: String): Entity =
-        apiService.getEntity(id).toDomain()
+    override suspend fun getEntity(id: String): Entity = apiService.getEntity(id).toDomain()
 }

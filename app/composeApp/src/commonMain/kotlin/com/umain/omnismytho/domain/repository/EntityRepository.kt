@@ -11,7 +11,10 @@ interface EntityRepository {
         pageSize: Int = 20,
     ): PaginatedResult<Entity>
 
-    suspend fun searchEntities(query: String, limit: Int = 10): List<Entity>
+    suspend fun searchEntities(
+        query: String,
+        limit: Int = 10,
+    ): List<Entity>
 
     suspend fun getEntity(id: String): Entity
 }
