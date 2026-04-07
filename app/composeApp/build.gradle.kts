@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -70,6 +72,10 @@ kotlin {
             // Serialization
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.coroutines.core)
+
+            // Room (offline-first)
+            implementation(libs.room.runtime)
+            implementation(libs.sqlite.bundled)
 
             // Logging
             implementation(libs.napier)
@@ -161,4 +167,16 @@ val generateApiConfig by tasks.registering {
 
 kotlin.sourceSets.commonMain {
     kotlin.srcDir(generateApiConfig.map { layout.buildDirectory.dir("generated/apiconfig") })
+}
+
+// ── Room KMP setup ──────────────────────────────────────────────────────────
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
+dependencies {
+    // Room KSP compiler for each target
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
 }
