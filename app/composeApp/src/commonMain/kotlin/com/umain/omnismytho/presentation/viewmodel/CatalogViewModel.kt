@@ -14,6 +14,7 @@ class CatalogViewModel(
     private var currentPage: Int = 1
     private var currentEntities: List<com.umain.omnismytho.domain.model.Entity> = emptyList()
     private var hasMore: Boolean = false
+    private var sortAscending: Boolean = true
 
     init {
         addEventHandler<CatalogEvent.LoadEntities> { _, emit ->
@@ -71,6 +72,24 @@ class CatalogViewModel(
 
         addEventHandler<CatalogEvent.OnEntityClicked> { event, emit ->
             emit.effect(CatalogEffect.NavigateToDetail(event.entityId))
+        }
+
+        addEventHandler<CatalogEvent.OnToggleSort> { _, emit ->
+            sortAscending = !sortAscending
+            currentEntities = if (sortAscending) {
+                currentEntities.sortedBy { it.name }
+            } else {
+                currentEntities.sortedByDescending { it.name }
+            }
+            emit.state(
+                CatalogState.Loaded(
+                    entities = currentEntities,
+                    currentFilter = currentFilter,
+                    hasMore = hasMore,
+                    currentPage = currentPage,
+                    sortAscending = sortAscending,
+                ),
+            )
         }
 
         addEventHandler<CatalogEvent.LoadNextPage> { _, emit ->
