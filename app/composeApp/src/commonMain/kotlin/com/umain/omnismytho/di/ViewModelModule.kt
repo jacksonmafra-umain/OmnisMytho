@@ -8,6 +8,7 @@ val viewModelModule =
     module {
         viewModel { HomeViewModel(get()) }
         viewModel { params -> CatalogViewModel(params.get(), get()) }
-        viewModel { params -> DetailViewModel(params.get(), get()) }
+        viewModel { params -> DetailViewModel(params.get(), get(), get()) }
         viewModel { SearchViewModel(get()) }
+        viewModel { SavedViewModel(get(), get()) }
     }
