@@ -23,6 +23,15 @@ from pathlib import Path
 
 import httpx
 
+# Auto-load .env if present
+_env_path = Path(__file__).parent.parent / ".env"
+if _env_path.exists():
+    for line in _env_path.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            key, _, value = line.partition("=")
+            os.environ.setdefault(key.strip(), value.strip())
+
 # ─── Wikipedia Scraping ───────────────────────────────────────────────────────
 
 WIKIPEDIA_API = "https://en.wikipedia.org/w/api.php"
@@ -106,6 +115,225 @@ MYTHOLOGY_ENTITIES: dict[str, dict] = {
             ("Asmodeus", "demon"), ("Lilith", "demon"),
             ("Azazel", "demon"), ("Baphomet", "demon"),
             ("Leviathan", "creature"), ("Behemoth", "creature"),
+        ],
+    },
+    "roman": {
+        "name": "Roman Mythology",
+        "origin": "Ancient Rome",
+        "entities": [
+            ("Jupiter (mythology)", "god"), ("Mars (mythology)", "god"),
+            ("Venus (mythology)", "god"), ("Neptune (mythology)", "god"),
+            ("Minerva", "god"), ("Diana (mythology)", "god"),
+            ("Mercury (mythology)", "god"), ("Pluto (mythology)", "god"),
+            ("Juno (mythology)", "god"), ("Saturn (mythology)", "god"),
+            ("Vulcan (mythology)", "god"), ("Bacchus", "god"),
+            ("Janus", "god"), ("Romulus and Remus", "creature"),
+        ],
+    },
+    "celtic": {
+        "name": "Celtic Mythology",
+        "origin": "British Isles & Gaul",
+        "entities": [
+            ("The Dagda", "god"), ("Brigid", "god"), ("Lugh", "god"),
+            ("Morrígan", "god"), ("Cernunnos", "god"), ("Manannán mac Lir", "god"),
+            ("Danu (Irish goddess)", "god"), ("Aengus", "god"),
+            ("Cú Chulainn", "creature"), ("Fionn mac Cumhaill", "creature"),
+            ("Banshee", "spirit"), ("Dullahan", "spirit"),
+            ("Balor", "demon"), ("Púca", "spirit"),
+        ],
+    },
+    "mesopotamian": {
+        "name": "Mesopotamian Mythology",
+        "origin": "Sumer, Babylon & Assyria",
+        "entities": [
+            ("Anu (god)", "god"), ("Enlil", "god"), ("Enki", "god"),
+            ("Inanna", "god"), ("Marduk", "god"), ("Ishtar", "god"),
+            ("Tiamat", "creature"), ("Ereshkigal", "god"),
+            ("Nergal", "god"), ("Shamash", "god"),
+            ("Gilgamesh", "creature"), ("Enkidu", "creature"),
+            ("Pazuzu", "demon"), ("Lamashtu", "demon"),
+        ],
+    },
+    "chinese": {
+        "name": "Chinese Mythology",
+        "origin": "China",
+        "entities": [
+            ("Jade Emperor", "god"), ("Sun Wukong", "god"),
+            ("Nüwa", "god"), ("Fuxi", "god"),
+            ("Guanyin", "god"), ("Erlang Shen", "god"),
+            ("Nezha", "god"), ("Dragon King", "god"),
+            ("Chang'e", "god"), ("Zhong Kui", "spirit"),
+            ("Chinese dragon", "creature"), ("Fenghuang", "creature"),
+            ("Qilin", "creature"), ("Yanluo Wang", "god"),
+        ],
+    },
+    "slavic": {
+        "name": "Slavic Mythology",
+        "origin": "Eastern Europe",
+        "entities": [
+            ("Perun", "god"), ("Veles (god)", "god"), ("Svarog", "god"),
+            ("Morana (goddess)", "god"), ("Stribog", "god"), ("Dazhbog", "god"),
+            ("Rod (Slavic religion)", "god"),
+            ("Baba Yaga", "creature"), ("Domovoy", "spirit"),
+            ("Rusalka", "spirit"), ("Leshy", "spirit"),
+            ("Koschei", "demon"), ("Zmey Gorynych", "creature"),
+        ],
+    },
+    "aztec": {
+        "name": "Aztec Mythology",
+        "origin": "Mesoamerica",
+        "entities": [
+            ("Quetzalcoatl", "god"), ("Tezcatlipoca", "god"),
+            ("Huitzilopochtli", "god"), ("Tlaloc", "god"),
+            ("Xipe Totec", "god"), ("Mictlantecuhtli", "god"),
+            ("Coatlicue", "god"), ("Chalchiuhtlicue", "god"),
+            ("Xolotl", "god"), ("Tonatiuh", "god"),
+            ("Ahuizotl (creature)", "creature"), ("Cipactli", "creature"),
+        ],
+    },
+    "mayan": {
+        "name": "Mayan Mythology",
+        "origin": "Mesoamerica",
+        "entities": [
+            ("Itzamna", "god"), ("Kukulkan", "god"),
+            ("Ix Chel", "god"), ("Chaac", "god"),
+            ("Ah Puch", "god"), ("Hunahpu", "god"),
+            ("Xbalanque", "god"), ("Hun Hunahpu", "god"),
+            ("Zipacna", "creature"), ("Camazotz", "demon"),
+        ],
+    },
+    "incan": {
+        "name": "Incan Mythology",
+        "origin": "South America (Andes)",
+        "entities": [
+            ("Inti", "god"), ("Viracocha", "god"),
+            ("Pachamama", "god"), ("Mama Quilla", "god"),
+            ("Supay", "demon"), ("Illapa", "god"),
+            ("Kon (mythology)", "god"), ("Mama Cocha", "god"),
+            ("Catequil", "god"), ("Ekeko", "god"),
+        ],
+    },
+    "polynesian": {
+        "name": "Polynesian Mythology",
+        "origin": "Polynesia & Oceania",
+        "entities": [
+            ("Māui (mythology)", "god"), ("Tāne", "god"),
+            ("Tangaroa", "god"), ("Tū (Māori god)", "god"),
+            ("Pele (deity)", "god"), ("Rongo", "god"),
+            ("Hina (goddess)", "god"), ("Whiro", "demon"),
+            ("Patupaiarehe", "spirit"), ("Menehune", "spirit"),
+        ],
+    },
+    "aboriginal": {
+        "name": "Aboriginal Australian Mythology",
+        "origin": "Australia (Dreamtime)",
+        "entities": [
+            ("Rainbow Serpent", "god"), ("Baiame", "god"),
+            ("Yowie", "creature"), ("Tiddalik", "creature"),
+            ("Bunyip", "creature"), ("Wollunqua", "creature"),
+            ("Altjira", "god"), ("Djanggawul", "spirit"),
+            ("Mimi (folklore)", "spirit"),
+        ],
+    },
+    "yoruba": {
+        "name": "Yoruba & West African Mythology",
+        "origin": "West Africa (Nigeria)",
+        "entities": [
+            ("Olorun", "god"), ("Obatala", "god"),
+            ("Shango", "god"), ("Ogun", "god"),
+            ("Yemoja", "god"), ("Oshun", "god"),
+            ("Eshu", "god"), ("Oya (deity)", "god"),
+            ("Orunmila", "god"), ("Anansi", "spirit"),
+            ("Mami Wata", "spirit"), ("Abiku", "demon"),
+        ],
+    },
+    "vodou": {
+        "name": "Vodou & Caribbean Syncretic Mythology",
+        "origin": "Haiti & Caribbean",
+        "entities": [
+            ("Papa Legba", "god"), ("Baron Samedi", "god"),
+            ("Maman Brigitte", "god"), ("Erzulie", "god"),
+            ("Damballa", "god"), ("Agwé", "god"),
+            ("Marinette (loa)", "demon"), ("Kalfu", "demon"),
+            ("Loco (loa)", "spirit"), ("Gran Bwa", "spirit"),
+        ],
+    },
+    "persian": {
+        "name": "Persian / Zoroastrian Mythology",
+        "origin": "Ancient Persia (Iran)",
+        "entities": [
+            ("Ahura Mazda", "god"), ("Angra Mainyu", "demon"),
+            ("Mithra", "god"), ("Anahita", "god"),
+            ("Rashnu", "god"), ("Sraosha", "angel"),
+            ("Atar", "god"), ("Verethragna", "god"),
+            ("Simurgh", "creature"), ("Azhi Dahaka", "demon"),
+            ("Div (mythology)", "demon"), ("Huma bird", "creature"),
+        ],
+    },
+    "korean": {
+        "name": "Korean Mythology",
+        "origin": "Korea",
+        "entities": [
+            ("Hwanung", "god"), ("Dangun", "god"),
+            ("Habaek", "god"), ("Jacheongbi", "god"),
+            ("Dokkaebi", "spirit"), ("Gumiho", "demon"),
+            ("Jeoseung Saja", "spirit"), ("Imoogi", "creature"),
+            ("Samjogo", "creature"), ("Bulgasari", "creature"),
+        ],
+    },
+    "tibetan": {
+        "name": "Tibetan & Bön Mythology",
+        "origin": "Tibet & Himalaya",
+        "entities": [
+            ("Padmasambhava", "god"), ("Palden Lhamo", "god"),
+            ("Vajrapani", "god"), ("Yamantaka", "god"),
+            ("Mahakala", "god"), ("Tara (Buddhism)", "god"),
+            ("Yeti", "creature"), ("Druk (mythology)", "creature"),
+            ("Gyalpo (spirit)", "demon"), ("Nyen", "spirit"),
+        ],
+    },
+    "finnish": {
+        "name": "Finnish & Kalevala Mythology",
+        "origin": "Finland & Karelia",
+        "entities": [
+            ("Ukko", "god"), ("Väinämöinen", "god"),
+            ("Louhi", "god"), ("Ilmarinen", "god"),
+            ("Lemminkäinen", "god"), ("Tapio (spirit)", "god"),
+            ("Tuoni", "god"), ("Mielikki", "god"),
+            ("Näkki", "spirit"), ("Hiisi", "demon"),
+        ],
+    },
+    "philippine": {
+        "name": "Philippine Mythology",
+        "origin": "Philippines",
+        "entities": [
+            ("Bathala", "god"), ("Mayari", "god"),
+            ("Tala (goddess)", "god"), ("Apolaki", "god"),
+            ("Dian Masalanta", "god"), ("Aswang", "demon"),
+            ("Tikbalang", "creature"), ("Diwata", "spirit"),
+            ("Bakunawa", "creature"), ("Kapre", "spirit"),
+        ],
+    },
+    "native_american": {
+        "name": "Native North American Mythology",
+        "origin": "North America",
+        "entities": [
+            ("Coyote (mythology)", "spirit"), ("Raven (mythology)", "spirit"),
+            ("Thunderbird (mythology)", "spirit"), ("Kokopelli", "spirit"),
+            ("Wendigo", "demon"), ("Skinwalker", "demon"),
+            ("Spider Grandmother", "god"), ("Great Spirit", "god"),
+            ("White Buffalo Calf Woman", "spirit"), ("Deer Woman", "spirit"),
+        ],
+    },
+    "indonesian": {
+        "name": "Indonesian & Malay Mythology",
+        "origin": "Southeast Asia",
+        "entities": [
+            ("Batara Guru", "god"), ("Dewi Sri", "god"),
+            ("Nyai Roro Kidul", "god"), ("Rangda", "demon"),
+            ("Barong (mythology)", "creature"), ("Garuda", "creature"),
+            ("Pontianak (folklore)", "demon"), ("Penanggalan", "demon"),
+            ("Jenglot", "creature"), ("Naga (mythology)", "creature"),
         ],
     },
 }
