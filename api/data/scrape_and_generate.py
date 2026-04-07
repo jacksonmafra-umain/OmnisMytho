@@ -1,15 +1,16 @@
 """
 Hybrid content pipeline for Omnis Mytho.
 1. Scrapes factual mythology data from Wikipedia API (free, no auth)
-2. Enriches with OpenAI GPT in grimoire tone
+2. Enriches with LLM in grimoire tone (OpenAI primary, Gemini fallback)
 3. Generates images with Fal.ai (nano banana)
 
 Usage:
-    python data/scrape_and_generate.py [--skip-images] [--mythology greek]
+    python data/scrape_and_generate.py [--skip-images] [--mythology greek] [--llm openai|gemini]
 
 Environment variables:
-    OPENAI_API_KEY  — for content enrichment
-    FAL_KEY         — for image generation (optional with --skip-images)
+    OPENAI_API_KEY    — for OpenAI (primary)
+    GEMINI_API_KEY    — for Google Gemini (fallback)
+    FAL_KEY           — for image generation (optional with --skip-images)
 """
 
 import argparse
@@ -26,7 +27,11 @@ import httpx
 
 WIKIPEDIA_API = "https://en.wikipedia.org/w/api.php"
 
-# Curated entity lists per mythology (ensures quality + relevance)
+WIKI_HEADERS = {
+    "User-Agent": "OmnisMytho/1.0 (https://github.com/omnismytho; educational mythology project)",
+}
+
+# Curated entity lists per mythology
 MYTHOLOGY_ENTITIES: dict[str, dict] = {
     "greek": {
         "name": "Greek Mythology",
@@ -106,11 +111,6 @@ MYTHOLOGY_ENTITIES: dict[str, dict] = {
 }
 
 
-WIKI_HEADERS = {
-    "User-Agent": "OmnisMytho/1.0 (https://github.com/omnismytho; educational mythology project)",
-}
-
-
 def fetch_wikipedia_extract(title: str) -> str:
     """Fetch the opening extract of a Wikipedia article."""
     params = {
@@ -129,36 +129,13 @@ def fetch_wikipedia_extract(title: str) -> str:
         for page in pages.values():
             extract = page.get("extract", "")
             if extract:
-                # Clean up: remove pronunciation guides, parenthetical noise
                 extract = re.sub(r'\([^)]*pronunciation[^)]*\)', '', extract)
                 extract = re.sub(r'\([^)]*listen[^)]*\)', '', extract)
                 extract = re.sub(r'\s+', ' ', extract).strip()
-                return extract[:2000]  # Cap at 2000 chars
+                return extract[:2000]
         return ""
     except Exception as e:
         print(f"    Wikipedia fetch failed for '{title}': {e}")
-        return ""
-
-
-def fetch_wikipedia_image(title: str) -> str:
-    """Fetch the main image URL from Wikipedia."""
-    params = {
-        "action": "query",
-        "titles": title,
-        "prop": "pageimages",
-        "piprop": "original",
-        "format": "json",
-        "redirects": 1,
-    }
-    try:
-        resp = httpx.get(WIKIPEDIA_API, params=params, headers=WIKI_HEADERS, timeout=15)
-        data = resp.json()
-        pages = data.get("query", {}).get("pages", {})
-        for page in pages.values():
-            original = page.get("original", {})
-            return original.get("source", "")
-        return ""
-    except Exception:
         return ""
 
 
@@ -171,8 +148,7 @@ def scrape_mythology(mythology_id: str) -> dict:
 
     scraped_entities = []
     for entity_name, entity_type in config["entities"]:
-        # Use the article title for Wikipedia, but clean name for display
-        display_name = entity_name.split(" (")[0]  # Remove disambiguation
+        display_name = entity_name.split(" (")[0]
         print(f"  Fetching: {display_name}...")
 
         extract = fetch_wikipedia_extract(entity_name)
@@ -187,7 +163,7 @@ def scrape_mythology(mythology_id: str) -> dict:
             "wikipedia_extract": extract,
         })
 
-        time.sleep(0.5)  # Be polite to Wikipedia API
+        time.sleep(0.5)
 
     print(f"  -> Scraped {len(scraped_entities)} entities")
     return {
@@ -198,7 +174,7 @@ def scrape_mythology(mythology_id: str) -> dict:
     }
 
 
-# ─── LLM Enrichment ──────────────────────────────────────────────────────────
+# ─── LLM Client Abstraction ──────────────────────────────────────────────────
 
 ENRICH_SYSTEM = """You are an ancient scholar writing entries for a forbidden grimoire called "Omnis Mytho".
 
@@ -236,29 +212,131 @@ Return ONLY valid JSON:
 }}"""
 
 
-def enrich_entity(entity: dict, client) -> dict:
-    """Use OpenAI to transform Wikipedia data into grimoire entry."""
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": ENRICH_SYSTEM},
-                {"role": "user", "content": ENRICH_USER.format(
-                    name=entity["name"],
-                    type=entity["type"],
-                    extract=entity["wikipedia_extract"],
-                )},
-            ],
-            temperature=0.8,
-            max_tokens=800,
-            response_format={"type": "json_object"},
-        )
+class LLMClient:
+    """Unified LLM client with OpenAI primary, Gemini fallback."""
 
-        text = response.choices[0].message.content
-        enriched = json.loads(text)
-        return enriched
-    except Exception as e:
-        print(f"    LLM enrichment failed: {e}")
+    def __init__(self, preferred: str = "auto"):
+        self.openai_client = None
+        self.gemini_client = None
+        self.active = None
+
+        if preferred in ("auto", "openai") and os.environ.get("OPENAI_API_KEY"):
+            try:
+                from openai import OpenAI
+                self.openai_client = OpenAI()
+                self.active = "openai"
+                print(f"  LLM: OpenAI (primary)")
+            except ImportError:
+                print("  OpenAI SDK not installed (pip install openai)")
+
+        if preferred in ("auto", "gemini") and os.environ.get("GEMINI_API_KEY"):
+            try:
+                from google import genai
+                self.gemini_client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+                if not self.active:
+                    self.active = "gemini"
+                    print(f"  LLM: Gemini (primary)")
+                else:
+                    print(f"  LLM: Gemini (fallback)")
+            except ImportError:
+                print("  Gemini SDK not installed (pip install google-genai)")
+
+        if preferred == "openai" and self.openai_client:
+            self.active = "openai"
+        elif preferred == "gemini" and self.gemini_client:
+            self.active = "gemini"
+
+        if not self.openai_client and not self.gemini_client:
+            print("\nNo LLM available. Set OPENAI_API_KEY or GEMINI_API_KEY.")
+            sys.exit(1)
+
+    def chat(self, system: str, user: str, json_mode: bool = False) -> str:
+        """Send a chat request, with automatic fallback."""
+        # Try primary
+        result = self._call(self.active, system, user, json_mode)
+        if result:
+            return result
+
+        # Fallback
+        fallback = "gemini" if self.active == "openai" else "openai"
+        if (fallback == "openai" and self.openai_client) or \
+           (fallback == "gemini" and self.gemini_client):
+            print(f"    -> Falling back to {fallback}...")
+            result = self._call(fallback, system, user, json_mode)
+            if result:
+                return result
+
+        return ""
+
+    def _call(self, provider: str, system: str, user: str, json_mode: bool) -> str:
+        try:
+            if provider == "openai" and self.openai_client:
+                return self._call_openai(system, user, json_mode)
+            elif provider == "gemini" and self.gemini_client:
+                return self._call_gemini(system, user, json_mode)
+        except Exception as e:
+            print(f"    {provider} error: {e}")
+        return ""
+
+    def _call_openai(self, system: str, user: str, json_mode: bool) -> str:
+        kwargs = {
+            "model": "gpt-4o-mini",
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            "temperature": 0.8,
+            "max_tokens": 800,
+        }
+        if json_mode:
+            kwargs["response_format"] = {"type": "json_object"}
+
+        response = self.openai_client.chat.completions.create(**kwargs)
+        return response.choices[0].message.content
+
+    def _call_gemini(self, system: str, user: str, json_mode: bool) -> str:
+        from google.genai import types
+
+        config = types.GenerateContentConfig(
+            system_instruction=system,
+            temperature=0.8,
+            max_output_tokens=800,
+        )
+        if json_mode:
+            config.response_mime_type = "application/json"
+
+        response = self.gemini_client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=user,
+            config=config,
+        )
+        return response.text
+
+
+def enrich_entity(entity: dict, llm: LLMClient) -> dict:
+    """Use LLM to transform Wikipedia data into grimoire entry."""
+    text = llm.chat(
+        system=ENRICH_SYSTEM,
+        user=ENRICH_USER.format(
+            name=entity["name"],
+            type=entity["type"],
+            extract=entity["wikipedia_extract"],
+        ),
+        json_mode=True,
+    )
+
+    if not text:
+        return None
+
+    try:
+        # Clean potential markdown fences
+        if "```json" in text:
+            text = text.split("```json")[1].split("```")[0]
+        elif "```" in text:
+            text = text.split("```")[1].split("```")[0]
+        return json.loads(text.strip())
+    except json.JSONDecodeError as e:
+        print(f"    JSON parse error: {e}")
         return None
 
 
@@ -335,21 +413,18 @@ def main():
     parser.add_argument("--skip-images", action="store_true", help="Skip image generation")
     parser.add_argument("--mythology", type=str, default=None,
                         help="Generate only one mythology (e.g. 'greek')")
+    parser.add_argument("--llm", type=str, choices=["auto", "openai", "gemini"], default="auto",
+                        help="LLM provider: auto (OpenAI primary, Gemini fallback), openai, or gemini")
     parser.add_argument("--output", type=str, default=None,
                         help="Output JSON path (default: data/generated/content.json)")
     args = parser.parse_args()
-
-    # Validate keys
-    if not os.environ.get("OPENAI_API_KEY"):
-        print("Set OPENAI_API_KEY environment variable.")
-        sys.exit(1)
 
     if not args.skip_images and not os.environ.get("FAL_KEY"):
         print("Set FAL_KEY for image generation, or use --skip-images.")
         sys.exit(1)
 
-    from openai import OpenAI
-    client = OpenAI()
+    # Initialize LLM with fallback
+    llm = LLMClient(preferred=args.llm)
 
     # Select mythologies
     if args.mythology:
@@ -374,31 +449,21 @@ def main():
         # Step 1: Scrape Wikipedia
         scraped = scrape_mythology(myth_id)
 
-        # Build mythology entry
         mythology_entry = {
             "id": myth_id,
             "name": scraped["name"],
             "origin": scraped["origin"],
-            "description": "",  # Will be enriched
+            "description": "",
             "entity_count": len(scraped["entities"]),
         }
 
         # Enrich mythology description
         print(f"\n  Enriching mythology description...")
-        try:
-            resp = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": ENRICH_SYSTEM},
-                    {"role": "user", "content": f"Write a 2-sentence grimoire-style description for {scraped['name']} ({scraped['origin']}). Return ONLY the text, no JSON."},
-                ],
-                temperature=0.8,
-                max_tokens=200,
-            )
-            mythology_entry["description"] = resp.choices[0].message.content.strip()
-        except Exception as e:
-            mythology_entry["description"] = f"The ancient tradition of {scraped['name']}."
-            print(f"    Description enrichment failed: {e}")
+        desc = llm.chat(
+            system=ENRICH_SYSTEM,
+            user=f"Write a 2-sentence grimoire-style description for {scraped['name']} ({scraped['origin']}). Return ONLY the text, no JSON.",
+        )
+        mythology_entry["description"] = desc.strip() if desc else f"The ancient tradition of {scraped['name']}."
 
         all_data["mythologies"].append(mythology_entry)
 
@@ -411,7 +476,7 @@ def main():
             print(f"\n  [{i+1}/{len(scraped['entities'])}] {entity_name}")
             print(f"    Enriching with LLM...")
 
-            enriched = enrich_entity(raw_entity, client)
+            enriched = enrich_entity(raw_entity, llm)
             if not enriched:
                 print(f"    -> Skipping (enrichment failed)")
                 continue
@@ -442,7 +507,7 @@ def main():
                 entity_entry["portrait_image"] = img_result.get("portrait", "")
 
             all_data["entities"].append(entity_entry)
-            time.sleep(0.3)  # Rate limiting
+            time.sleep(0.3)
 
     # Save output
     output_path = Path(args.output) if args.output else output_dir / "content.json"
