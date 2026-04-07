@@ -15,7 +15,12 @@
       "Bash(mkdir -p \"$BASE/data/remote\")",
       "Bash(BASE=\"/Users/jackson.mafra/Downloads/Projects/OmnisMytho/app/composeApp/src/commonMain/kotlin/com/umain/omnismytho/presentation/ui\")",
       "Read(//Users/jackson.mafra/Downloads/Projects/OmnisMytho/$BASE/**)",
-      "Bash(./gradlew :composeApp:compileDebugKotlinAndroid)"
+      "Bash(./gradlew :composeApp:compileDebugKotlinAndroid)",
+      "Bash(python -c \":*)",
+      "Bash(chmod +x /Users/jackson.mafra/Downloads/Projects/OmnisMytho/api/run_api.sh)",
+      "Bash(xargs kill:*)",
+      "Bash(./gradlew :composeApp:generateApiConfig :composeApp:compileDebugKotlinAndroid)",
+      "Bash(./gradlew :composeApp:generateApiConfig)"
     ]
   }
 }

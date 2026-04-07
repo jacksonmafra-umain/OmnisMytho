@@ -1,5 +1,6 @@
 package com.umain.omnismytho.presentation.ui.molecule
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
@@ -18,33 +19,31 @@ fun MythologyCard(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick),
-        colors =
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            ),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
         shape = MaterialTheme.shapes.medium,
-        border =
-            CardDefaults.outlinedCardBorder().copy(
-                width = 1.dp,
-            ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Column(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.Bottom,
         ) {
             Text(
-                text = mythology.name.replace(" Mythology", "").replace(" Demonology & Angelology", ""),
+                text = mythology.name
+                    .replace(" Mythology", "")
+                    .replace(" Demonology & Angelology", ""),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
             )
+            Spacer(Modifier.height(2.dp))
             Text(
                 text = "${mythology.entityCount} entities",
                 style = MaterialTheme.typography.labelSmall,

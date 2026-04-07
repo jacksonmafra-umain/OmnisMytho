@@ -115,14 +115,21 @@ dependencies {
 }
 
 // ── Generate ApiConfig.kt from gradle.properties ────────────────────────────
+// Reads api.baseUrl at execution time (not configuration time) so the task
+// re-runs whenever the property changes, including after ngrok restarts.
 val generateApiConfig by tasks.registering {
-    val baseUrl = providers.gradleProperty("api.baseUrl")
-        .getOrElse("http://10.0.2.2:8000/api/v1")
+    val propsFile = rootProject.file("gradle.properties")
     val outputDir = layout.buildDirectory.dir("generated/apiconfig/com/umain/omnismytho/data/remote")
 
+    inputs.file(propsFile)
     outputs.dir(outputDir)
 
     doLast {
+        // Read fresh from file at execution time
+        val props = Properties()
+        propsFile.inputStream().use { props.load(it) }
+        val baseUrl = props.getProperty("api.baseUrl", "http://10.0.2.2:8000/api/v1")
+
         val dir = outputDir.get().asFile
         dir.mkdirs()
         dir.resolve("ApiConfig.kt").writeText(
@@ -138,6 +145,7 @@ val generateApiConfig by tasks.registering {
             |}
             """.trimMargin()
         )
+        println("ApiConfig.BASE_URL = $baseUrl")
     }
 }
 

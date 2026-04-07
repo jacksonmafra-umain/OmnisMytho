@@ -1,5 +1,6 @@
 package com.umain.omnismytho.presentation.ui.molecule
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,15 +23,20 @@ fun OmSearchBar(
     readOnly: Boolean = false,
     onClick: (() -> Unit)? = null,
 ) {
+    val shape = RoundedCornerShape(12.dp)
     TextField(
         value = query,
         onValueChange = onQueryChange,
-        modifier = modifier.fillMaxWidth().height(48.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape),
         readOnly = readOnly,
         placeholder = {
             Text(
                 text = placeholder,
                 style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
         leadingIcon = {
@@ -40,29 +46,22 @@ fun OmSearchBar(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
-        trailingIcon =
-            if (query.isNotEmpty() && onClear != null) {
-                {
-                    IconButton(onClick = onClear) {
-                        Icon(
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = "Clear",
-                        )
-                    }
+        trailingIcon = if (query.isNotEmpty() && onClear != null) {
+            {
+                IconButton(onClick = onClear) {
+                    Icon(Icons.Default.Clear, contentDescription = "Clear")
                 }
-            } else {
-                null
-            },
+            }
+        } else null,
         singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-        colors =
-            TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = MaterialTheme.colorScheme.primary,
-            ),
+        shape = shape,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            cursorColor = MaterialTheme.colorScheme.primary,
+        ),
         textStyle = MaterialTheme.typography.bodyMedium,
     )
 }
