@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from data.seed_data import ENTITIES, MYTHOLOGIES
+from data.loader import ENTITIES, MYTHOLOGIES
 from models import EntitySummary, Mythology, MythologyDetail
 
 router = APIRouter(prefix="/mythologies", tags=["Mythologies"])

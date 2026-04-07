@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query
 
-from data.seed_data import ENTITIES
+from data.loader import ENTITIES
 from models import Alignment, Entity, EntityType, PaginatedResponse
 
 router = APIRouter(prefix="/entities", tags=["Entities"])
