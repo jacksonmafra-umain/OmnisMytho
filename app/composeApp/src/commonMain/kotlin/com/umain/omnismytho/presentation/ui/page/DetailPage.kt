@@ -72,6 +72,7 @@ fun DetailPage(
                     onBack = onNavigateBack,
                     onBookmark = { scope.launch { snackbarHostState.showSnackbar("Bookmarked!") } },
                     onShare = { scope.launch { snackbarHostState.showSnackbar("Share coming soon") } },
+                    snackbarHostState = snackbarHostState,
                     header = { DetailHeader(entity = s.entity) },
                     attributes = { DetailAttributes(entity = s.entity) },
                 )
