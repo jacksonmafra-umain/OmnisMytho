@@ -10,7 +10,7 @@ import org.koin.dsl.module
 
 val repositoryModule =
     module {
-        single<MythologyRepository> { MythologyRepositoryImpl(get()) }
-        single<EntityRepository> { EntityRepositoryImpl(get()) }
-        single<BookmarkRepository> { BookmarkRepositoryImpl() }
+        single<MythologyRepository> { MythologyRepositoryImpl(get(), get()) }
+        single<EntityRepository> { EntityRepositoryImpl(get(), get()) }
+        single<BookmarkRepository> { BookmarkRepositoryImpl(get()) }
     }
