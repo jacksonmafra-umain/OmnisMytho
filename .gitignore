@@ -39,3 +39,6 @@ captures/
 
 # Pencil
 *.pen.bak
+
+.claude/*
+.claude/settings.local.json
