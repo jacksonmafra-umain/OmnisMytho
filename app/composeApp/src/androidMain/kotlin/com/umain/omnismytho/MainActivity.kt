@@ -7,6 +7,8 @@ import androidx.activity.enableEdgeToEdge
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Switch from splash theme to base theme
+        setTheme(R.style.Theme_OmnisMytho)
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
