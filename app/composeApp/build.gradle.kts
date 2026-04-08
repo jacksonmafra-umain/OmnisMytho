@@ -49,8 +49,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
-            // Navigation
-            implementation(libs.navigation.compose)
+            // Navigation 3
+            implementation(libs.navigation3.ui)
+            implementation(libs.lifecycle.viewmodel.navigation3)
 
             // Ktor (HTTP)
             implementation(libs.ktor.client.core)
