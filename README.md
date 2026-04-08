@@ -2,7 +2,7 @@
 
 **Encyclopaedia of the Divine & Profane**
 
-A mythology encyclopedia app showcasing modern Android/KMP development — gods, demons, angels, spirits and creatures from six mythological traditions, rendered in the style of an ancient grimoire.
+A mythology encyclopedia app showcasing modern Android/KMP development — gods, demons, angels, spirits and creatures from 25 mythological traditions, rendered in the style of an ancient grimoire.
 
 > *ab origine mundi*
 
@@ -16,7 +16,8 @@ Omnis Mytho is not just an encyclopedia — it's a **technical showcase** of Kot
 - **Koin** dependency injection (multiplatform)
 - **Ktor** HTTP networking
 - **Coil3** async image loading
-- **Compose Navigation** with type-safe routes
+- **Navigation 3** with explicit back stack and type-safe NavKey routes
+- **Room KMP** offline-first data persistence
 - **Atomic Design** component architecture
 - **Material3** theming with custom grimoire palette
 - **FastAPI** backend with OpenAPI documentation
@@ -25,14 +26,23 @@ Omnis Mytho is not just an encyclopedia — it's a **technical showcase** of Kot
 
 ## Mythologies
 
-| Tradition | Origin | Entities |
-|-----------|--------|----------|
-| Greek | Ancient Greece | Zeus, Athena, Hades, Medusa, Hecate, Cerberus |
-| Norse | Scandinavia | Odin, Thor, Loki, Fenrir, Freyja |
-| Egyptian | Ancient Egypt | Anubis, Ra, Isis, Set, Hathor |
-| Hindu | Indian Subcontinent | Shiva, Kali, Ganesha, Ravana, Garuda |
-| Japanese | Japan | Amaterasu, Susanoo, Oni, Kitsune |
-| Christian | Abrahamic Tradition | Michael, Lucifer, Azrael, Lilith, Beelzebub |
+**25 mythologies, 301 entities** — from Greek gods to Filipino diwata:
+
+| Tradition | Entities | Tradition | Entities |
+|-----------|----------|-----------|----------|
+| Greek | 23 | Roman | 14 |
+| Norse | 14 | Celtic | 14 |
+| Egyptian | 16 | Mesopotamian | 14 |
+| Hindu | 15 | Chinese | 14 |
+| Japanese | 14 | Slavic | 13 |
+| Christian | 14 | Aztec | 12 |
+| Mayan | 10 | Incan | 9 |
+| Polynesian | 9 | Aboriginal | 9 |
+| Yoruba | 11 | Vodou | 10 |
+| Persian | 12 | Korean | 8 |
+| Tibetan | 8 | Finnish | 10 |
+| Philippine | 8 | Native American | 10 |
+| Indonesian | 10 | | |
 
 ---
 
@@ -76,6 +86,8 @@ Omnis Mytho is not just an encyclopedia — it's a **technical showcase** of Kot
 - **Repository Pattern** — interfaces in domain, implementations in data
 - **DTO/Domain Separation** — API DTOs mapped to clean domain models
 - **Navigation via Effects** — ViewModels emit navigation effects, Pages handle routing
+- **Offline-first** — Room caches API data, bookmarks persist across restarts
+- **Navigation 3** — Explicit back stack with NavDisplay + entryProvider pattern
 - **SOLID + DRY** for business logic, **Atomic Design** for UI
 
 ---
@@ -89,11 +101,13 @@ Omnis Mytho is not just an encyclopedia — it's a **technical showcase** of Kot
 | Compose Multiplatform | 1.10.3 | UI framework |
 | Material3 | 1.10.0-alpha05 | Design system |
 | Revolver | 1.6.0 | MVI state management |
-| Koin | 4.0.4 | Dependency injection |
-| Ktor | 3.1.3 | HTTP client |
-| Coil3 | 3.2.0 | Image loading |
-| Navigation Compose | 2.9.0-alpha14 | Type-safe navigation |
-| kotlinx.serialization | 1.8.1 | JSON parsing |
+| Koin | 4.2.0 | Dependency injection |
+| Ktor | 3.4.2 | HTTP client |
+| Coil3 | 3.4.0 | Image loading |
+| Navigation 3 | 1.0.0-alpha05 | NavDisplay + explicit back stack |
+| Room KMP | 2.7.1 | Offline-first local database |
+| KSP | 2.3.6 | Annotation processing |
+| kotlinx.serialization | 1.10.0 | JSON parsing |
 
 ### Backend (API)
 | Technology | Version | Purpose |
@@ -293,17 +307,29 @@ Or open `app/` in Android Studio and run the `composeApp` configuration.
 
 Open `app/iosApp/iosApp.xcodeproj` in Xcode and run on simulator.
 
+### Run API with ngrok (for device testing)
+
+```bash
+cd api
+./run_api.sh    # Starts uvicorn + ngrok, writes URL to app/gradle.properties
+```
+
 ### Generate Content (Optional)
 
 ```bash
-# Generate mythology data via Claude API
-export ANTHROPIC_API_KEY=sk-ant-...
-cd api
-python data/generate_content.py
+cd api && source .venv/bin/activate
+
+# Wikipedia scrape only (no API key needed)
+python data/scrape_and_generate.py --no-llm --skip-images
+
+# With LLM enrichment (OpenAI primary, Gemini fallback)
+export OPENAI_API_KEY=sk-...
+export GEMINI_API_KEY=AI...
+python data/scrape_and_generate.py --skip-images
 
 # Generate grimoire-style images
-export FAL_KEY=...  # for nano-banana
-python data/generate_images.py --backend nano-banana
+export FAL_KEY=...
+python data/scrape_and_generate.py --no-llm
 ```
 
 ---
@@ -317,6 +343,7 @@ python data/generate_images.py --backend nano-banana
 | **Catalog** | Entity grid with filter chips (All/Gods/Demons/Creatures) |
 | **Detail** | Immersive hero image, description, attributes, powers |
 | **Search** | Live search with results + recent searches |
+| **Saved** | Bookmarked entities grid (persisted with Room) |
 
 ---
 
@@ -334,13 +361,19 @@ All illustrations follow a consistent grimoire aesthetic:
 ## Roadmap
 
 - [x] Design — 5 screens in Pencil (dark mode, grimoire style)
-- [x] API — FastAPI with OpenAPI docs, 30 entities
-- [x] Seed data — 6 mythologies, grimoire-tone descriptions
+- [x] API — FastAPI with OpenAPI docs, 301 entities, 25 mythologies
+- [x] Content pipeline — Wikipedia scrape + LLM enrichment (OpenAI/Gemini)
 - [x] Image generation scripts (nano banana + DALL-E)
-- [ ] KMP app — Compose + Revolver + Koin + Navigation
-- [ ] Offline mode — Room/SQLDelight local cache
+- [x] KMP app — Compose + Revolver + Koin + Navigation 3
+- [x] Offline-first — Room KMP local cache for entities, mythologies, bookmarks
+- [x] Bookmarks — persistent save/unsave with Room, filled icon toggle
+- [x] Animations — spring physics, staggered entrances, shimmer loading
+- [x] 62+ @Preview annotations (dark mode, 1.5x font, landscape)
+- [x] A-Z / Z-A sort toggle in catalog
+- [x] Edge-to-edge UI with system bar insets
+- [x] Custom app icon and Android 12+ splash screen
 - [ ] Paging 3 — infinite scroll in catalog
-- [ ] Animations — shared element transitions
+- [ ] Shared element transitions between catalog and detail
 - [ ] Deep links — open entity directly
 - [ ] TTS — text-to-speech for descriptions
 - [ ] A/B testing — feature flags demo
