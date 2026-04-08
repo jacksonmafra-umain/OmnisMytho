@@ -1,6 +1,8 @@
 package com.umain.omnismytho.presentation.ui.page
 
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +43,13 @@ fun SplashPage(onNavigateToHome: () -> Unit) {
         targetValue = if (visible) 1f else 0f,
         animationSpec = tween(800, delayMillis = 200),
     )
+    val titleScale by animateFloatAsState(
+        targetValue = if (visible) 1f else 0.85f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessLow,
+        ),
+    )
     val subtitleAlpha by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
         animationSpec = tween(800, delayMillis = 600),
@@ -59,7 +69,9 @@ fun SplashPage(onNavigateToHome: () -> Unit) {
                 style = MaterialTheme.typography.displayLarge,
                 color = MaterialTheme.colorScheme.primary,
                 letterSpacing = 6.sp,
-                modifier = Modifier.alpha(titleAlpha),
+                modifier = Modifier
+                    .alpha(titleAlpha)
+                    .graphicsLayer { scaleX = titleScale; scaleY = titleScale },
             )
             Text(
                 text = "Encyclopaedia of the Divine & Profane",
