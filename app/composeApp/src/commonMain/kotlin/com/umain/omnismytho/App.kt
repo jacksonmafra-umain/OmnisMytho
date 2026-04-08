@@ -7,13 +7,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.umain.omnismytho.presentation.navigation.AppNavGraph
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
 import com.umain.omnismytho.presentation.navigation.Route
+import com.umain.omnismytho.presentation.navigation.appEntryProvider
 import com.umain.omnismytho.presentation.ui.organism.BottomNavBar
 import com.umain.omnismytho.presentation.ui.organism.NavTab
 import com.umain.omnismytho.presentation.ui.theme.OmnisMythoTheme
@@ -21,61 +24,56 @@ import com.umain.omnismytho.presentation.ui.theme.OmnisMythoTheme
 @Composable
 fun App() {
     OmnisMythoTheme(darkTheme = true) {
-        val navController = rememberNavController()
-        val backStackEntry by navController.currentBackStackEntryAsState()
+        val backStack = rememberNavBackStack(Route.Splash)
 
-        val currentRoute = backStackEntry?.destination?.route ?: ""
-        val currentTab =
-            when {
-                currentRoute.contains("Home") -> NavTab.HOME
-                currentRoute.contains("Catalog") -> NavTab.CATALOG
-                currentRoute.contains("Search") -> NavTab.SEARCH
-                currentRoute.contains("Saved") -> NavTab.SAVED
-                else -> NavTab.HOME
+        // Derive current tab from the back stack top
+        val currentKey by remember { derivedStateOf { backStack.lastOrNull() } }
+        val currentTab by remember {
+            derivedStateOf {
+                when (currentKey) {
+                    is Route.Home -> NavTab.HOME
+                    is Route.CatalogAll, is Route.Catalog -> NavTab.CATALOG
+                    is Route.Search -> NavTab.SEARCH
+                    is Route.Saved -> NavTab.SAVED
+                    else -> NavTab.HOME
+                }
             }
+        }
 
-        val showBottomNav =
-            currentRoute.contains("Home") ||
-                currentRoute.contains("Catalog") ||
-                currentRoute.contains("Search") ||
-                currentRoute.contains("Saved")
+        val showBottomNav by remember {
+            derivedStateOf {
+                currentKey is Route.Home ||
+                    currentKey is Route.CatalogAll ||
+                    currentKey is Route.Catalog ||
+                    currentKey is Route.Search ||
+                    currentKey is Route.Saved
+            }
+        }
 
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background,
-            // Let each screen handle its own insets for true edge-to-edge
             contentWindowInsets = WindowInsets(0.dp),
             bottomBar = {
                 if (showBottomNav) {
                     BottomNavBar(
                         currentTab = currentTab,
                         onTabSelected = { tab ->
-                            when (tab) {
-                                NavTab.HOME -> {
-                                    navController.navigate(Route.Home) {
-                                        popUpTo(Route.Home) { inclusive = true }
-                                    }
+                            // Pop to Home first, then push the tab destination
+                            val target: NavKey = when (tab) {
+                                NavTab.HOME -> Route.Home
+                                NavTab.CATALOG -> Route.CatalogAll
+                                NavTab.SEARCH -> Route.Search
+                                NavTab.SAVED -> Route.Saved
+                            }
+                            // Keep Home as root, replace everything above it
+                            val homeIndex = backStack.indexOfFirst { it is Route.Home }
+                            if (homeIndex >= 0) {
+                                while (backStack.size > homeIndex + 1) {
+                                    backStack.removeAt(backStack.lastIndex)
                                 }
-
-                                NavTab.CATALOG -> {
-                                    navController.navigate(Route.CatalogAll) {
-                                        popUpTo(Route.Home) { inclusive = false }
-                                        launchSingleTop = true
-                                    }
-                                }
-
-                                NavTab.SEARCH -> {
-                                    navController.navigate(Route.Search) {
-                                        popUpTo(Route.Home) { inclusive = false }
-                                        launchSingleTop = true
-                                    }
-                                }
-
-                                NavTab.SAVED -> {
-                                    navController.navigate(Route.Saved) {
-                                        popUpTo(Route.Home) { inclusive = false }
-                                        launchSingleTop = true
-                                    }
-                                }
+                            }
+                            if (target !is Route.Home) {
+                                backStack.add(target)
                             }
                         },
                     )
@@ -83,12 +81,19 @@ fun App() {
             },
         ) { paddingValues ->
             Box(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
             ) {
-                AppNavGraph(navController = navController)
+                NavDisplay(
+                    backStack = backStack,
+                    entryProvider = appEntryProvider(backStack),
+                    onBack = {
+                        if (backStack.size > 1) {
+                            backStack.removeAt(backStack.lastIndex)
+                        }
+                    },
+                )
             }
         }
     }
