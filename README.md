@@ -8,6 +8,22 @@ A mythology encyclopedia app showcasing modern Android/KMP development — gods,
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/splash.png" alt="Splash" width="18%" />
+  <img src="docs/screenshots/home.png" alt="Home" width="18%" />
+  <img src="docs/screenshots/catalog.png" alt="Catalog" width="18%" />
+  <img src="docs/screenshots/detail.png" alt="Detail" width="18%" />
+  <img src="docs/screenshots/search.png" alt="Search" width="18%" />
+</p>
+
+<p align="center">
+  <sub>Splash · Home · Catalog · Detail · Search</sub>
+</p>
+
+---
+
 ## Overview
 
 Omnis Mytho is not just an encyclopedia — it's a **technical showcase** of Kotlin Multiplatform, Jetpack Compose, and modern mobile architecture. The mythology content provides a rich, visually striking context to demonstrate:
